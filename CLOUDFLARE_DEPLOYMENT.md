@@ -34,7 +34,7 @@
 4. **Environment Variables:**
    Add in Cloudflare Pages > Settings > Environment variables:
    ```
-   NODE_VERSION = 18.17.0
+   NODE_VERSION = 20.18.1
    NPM_FLAGS = --legacy-peer-deps
    NPM_CONFIG_LEGACY_PEER_DEPS = true
    TURSO_CONNECTION_URL = your_turso_connection_url
@@ -45,7 +45,7 @@
    ```
 
 5. **Advanced Settings:**
-   - Node.js version: 18.17.0
+   - Node.js version: 20.18.1
    - Build timeout: 20 minutes
 
 ### Step 3: Configure for Static Export
