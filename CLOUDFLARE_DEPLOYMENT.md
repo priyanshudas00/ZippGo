@@ -25,9 +25,9 @@
 
 3. **Build Configuration:**
    ```
-   Framework preset: Next.js (Static HTML Export)
-   Build command: npm run build
-   Build output directory: out
+   Framework preset: Next.js
+   Build command: npm install --legacy-peer-deps && npm run build
+   Build output directory: .next
    Root directory: /
    ```
 
@@ -36,6 +36,12 @@
    ```
    NODE_VERSION = 18.17.0
    NPM_FLAGS = --legacy-peer-deps
+   NPM_CONFIG_LEGACY_PEER_DEPS = true
+   TURSO_CONNECTION_URL = your_turso_connection_url
+   TURSO_AUTH_TOKEN = your_turso_auth_token
+   BETTER_AUTH_SECRET = your_better_auth_secret
+   GOOGLE_CLIENT_ID = your_google_client_id
+   GOOGLE_CLIENT_SECRET = your_google_client_secret
    ```
 
 5. **Advanced Settings:**
