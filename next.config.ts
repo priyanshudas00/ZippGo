@@ -23,8 +23,24 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  logging: {
+    fetches: {
+      fullUrl: false,
+    },
+  },
+  experimental: {
+    optimizeServerReact: false,
+  },
   turbopack: {
+    resolveAlias: {
+      underscore: 'lodash',
+      mocha: { browser: 'mocha/browser-entry.js' },
+    },
     rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
       "*.{jsx,tsx}": {
         loaders: [LOADER]
       }

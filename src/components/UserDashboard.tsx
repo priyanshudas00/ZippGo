@@ -77,15 +77,13 @@ export default function UserDashboard() {
       setLoading(true);
       setError(null);
 
-      // Try to fetch user data from database, fallback to session data
-      let userData = {
-        id: parseInt(session.user.id) || 0,
-        name: session.user.name || 'User',
-        email: session.user.email || '',
-        phone: '',
-        city: null,
-      };
+      // Check if session and user exist
+      if (!session?.user?.email) {
+        throw new Error('No user session found');
+      }
 
+      // Try to fetch user data from database first
+      let userData = null;
       try {
         const userRes = await fetch(`/api/users?email=${encodeURIComponent(session.user.email)}`);
         if (userRes.ok) {
@@ -99,28 +97,75 @@ export default function UserDashboard() {
           };
         }
       } catch (error) {
-        console.log('User not found in database, using session data');
+        console.log('User lookup failed:', error);
+      }
+
+      // If user not found in database, create user
+      if (!userData) {
+        try {
+          const createUserRes = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: session.user.name || 'User',
+              email: session.user.email,
+              role: 'user'
+            })
+          });
+          
+          if (createUserRes.ok) {
+            const newUser = await createUserRes.json();
+            userData = {
+              id: newUser.id,
+              name: newUser.name,
+              email: newUser.email,
+              phone: newUser.phone || '',
+              city: newUser.city || null,
+            };
+          } else {
+            // Log the error response for debugging
+            const errorText = await createUserRes.text();
+            console.error('User creation failed:', errorText);
+            throw new Error(`Failed to create user: ${errorText}`);
+          }
+        } catch (error) {
+          console.error('User creation error:', error);
+          throw new Error('Failed to create user account');
+        }
       }
 
       setUser(userData);
 
-      // Fetch user bookings
-      const bookingsRes = await fetch(`/api/bookings?userId=${userData.id}&limit=20`);
-      if (!bookingsRes.ok) throw new Error('Failed to fetch bookings');
-      const bookingsData = await bookingsRes.json();
-      setBookings(bookingsData);
+      // Only fetch bookings if we have a valid user ID
+      let bookingsData: Booking[] = [];
+      if (userData && userData.id) {
+        const bookingsRes = await fetch(`/api/bookings?userId=${userData.id}&limit=20`);
+        if (!bookingsRes.ok) {
+          console.warn('Failed to fetch bookings, user may not have any bookings yet');
+          setBookings([]);
+        } else {
+          bookingsData = await bookingsRes.json();
+          setBookings(bookingsData);
+        }
+      } else {
+        setBookings([]);
+      }
 
       // Fetch vehicles for bookings
-      const vehicleIds = [...new Set(bookingsData.map((b: Booking) => b.vehicleId))];
-      const vehiclePromises = vehicleIds.map(id => 
-        fetch(`/api/vehicles?id=${id}`).then(res => res.json())
-      );
-      const vehiclesData = await Promise.all(vehiclePromises);
-      const vehiclesMap = vehiclesData.reduce((acc, vehicle) => {
-        acc[vehicle.id] = vehicle;
-        return acc;
-      }, {} as { [key: number]: Vehicle });
-      setVehicles(vehiclesMap);
+      if (bookingsData.length > 0) {
+        const vehicleIds = [...new Set(bookingsData.map((b: Booking) => b.vehicleId))];
+        const vehiclePromises = vehicleIds.map(id => 
+          fetch(`/api/vehicles?id=${id}`).then(res => res.json())
+        );
+        const vehiclesData = await Promise.all(vehiclePromises);
+        const vehiclesMap = vehiclesData.reduce((acc, vehicle) => {
+          acc[vehicle.id] = vehicle;
+          return acc;
+        }, {} as { [key: number]: Vehicle });
+        setVehicles(vehiclesMap);
+      } else {
+        setVehicles({});
+      }
 
       // Fetch active coupons
       const couponsRes = await fetch('/api/coupons?status=active&limit=3');

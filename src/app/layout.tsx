@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import "@/lib/console-filter"; // Suppress Fast Refresh console messages
 
 export const metadata: Metadata = {
   title: "ZippGo Mobility - India's Smartest Bike Rental Platform",

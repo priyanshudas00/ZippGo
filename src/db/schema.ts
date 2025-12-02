@@ -5,7 +5,7 @@ export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
-  phone: text('phone').notNull().unique(),
+  phone: text('phone').unique(), // Made optional for OAuth users
   role: text('role').notNull(), // 'user', 'partner', 'admin', 'staff'
   profileImage: text('profile_image'),
   address: text('address'),
@@ -43,10 +43,14 @@ export const bookings = sqliteTable('bookings', {
   endDate: text('end_date'),
   durationType: text('duration_type').notNull(), // 'hourly', 'daily', 'monthly'
   totalAmount: integer('total_amount').notNull(),
-  status: text('status').notNull().default('active'), // 'active', 'completed', 'cancelled'
+  status: text('status').notNull().default('pending'), // 'pending', 'active', 'completed', 'cancelled'
   paymentStatus: text('payment_status').notNull().default('pending'), // 'pending', 'paid', 'refunded'
   pickupLocation: text('pickup_location').notNull(),
   dropLocation: text('drop_location'),
+  kycData: text('kyc_data'), // JSON string of KYC documents
+  paymentData: text('payment_data'), // JSON string of payment details
+  adminApproved: integer('admin_approved', { mode: 'boolean' }).default(false),
+  kycVerified: integer('kyc_verified', { mode: 'boolean' }).default(false),
   createdAt: text('created_at').notNull(),
 });
 

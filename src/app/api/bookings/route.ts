@@ -45,8 +45,13 @@ export async function GET(request: NextRequest) {
 
     // Build filter conditions
     const conditions = [];
-    if (userId) {
+    if (userId && !isNaN(parseInt(userId))) {
       conditions.push(eq(bookings.userId, parseInt(userId)));
+    } else if (userId && isNaN(parseInt(userId))) {
+      return NextResponse.json(
+        { error: 'Invalid userId provided', code: 'INVALID_USER_ID' },
+        { status: 400 }
+      );
     }
     if (vehicleId) {
       conditions.push(eq(bookings.vehicleId, parseInt(vehicleId)));
@@ -91,6 +96,8 @@ export async function POST(request: NextRequest) {
       paymentStatus,
       pickupLocation,
       dropLocation,
+      kycData,
+      paymentData,
     } = body;
 
     // Validate required fields
@@ -156,10 +163,14 @@ export async function POST(request: NextRequest) {
       endDate: endDate ? endDate.trim() : null,
       durationType: durationType.trim(),
       totalAmount: parseInt(totalAmount),
-      status: status?.trim() || 'active',
+      status: status?.trim() || 'pending', // Default to pending for admin approval
       paymentStatus: paymentStatus?.trim() || 'pending',
       pickupLocation: pickupLocation.trim(),
       dropLocation: dropLocation ? dropLocation.trim() : null,
+      kycData: kycData ? JSON.stringify(kycData) : null,
+      paymentData: paymentData ? JSON.stringify(paymentData) : null,
+      adminApproved: false, // Requires admin approval
+      kycVerified: false, // Requires KYC verification
       createdAt: new Date().toISOString(),
     };
 

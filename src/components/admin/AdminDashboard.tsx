@@ -311,6 +311,31 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
+        {/* Pending Approvals Alert */}
+        <div className="mb-8">
+          <Card className="border-orange-200 bg-orange-50">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-orange-900">Pending Bookings</h3>
+                    <p className="text-orange-700">New bookings awaiting approval and KYC verification</p>
+                  </div>
+                </div>
+                <Link href="/admin/bookings?status=pending">
+                  <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+                    Review Bookings
+                    <ArrowUpRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Quick Actions */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Quick Actions</h2>

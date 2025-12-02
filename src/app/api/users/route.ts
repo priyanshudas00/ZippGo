@@ -44,6 +44,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(user[0], { status: 200 });
     }
 
+    // Check for specific email lookup
+    const email = searchParams.get('email');
+    if (email) {
+      const user = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email.toLowerCase()))
+        .limit(1);
+
+      if (user.length === 0) {
+        return NextResponse.json(
+          { error: 'User not found', code: 'USER_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(user[0], { status: 200 });
+    }
+
     const limit = Math.min(parseInt(searchParams.get('limit') ?? '10'), 100);
     const offset = parseInt(searchParams.get('offset') ?? '0');
     const search = searchParams.get('search');
@@ -119,19 +138,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!phone || !phone.trim()) {
-      return NextResponse.json(
-        { error: 'Phone is required', code: 'MISSING_PHONE' },
-        { status: 400 }
-      );
-    }
-
-    const cleanedPhone = phone.trim().replace(/[\s-]/g, '');
-    if (!validatePhone(cleanedPhone)) {
-      return NextResponse.json(
-        { error: 'Invalid phone format. Phone must be 10 digits', code: 'INVALID_PHONE' },
-        { status: 400 }
-      );
+    // Phone is optional for OAuth users, required for manual registration
+    let cleanedPhone = null;
+    if (phone && phone.trim()) {
+      cleanedPhone = phone.trim().replace(/[\s-]/g, '');
+      if (!validatePhone(cleanedPhone)) {
+        return NextResponse.json(
+          { error: 'Invalid phone format. Phone must be 10 digits', code: 'INVALID_PHONE' },
+          { status: 400 }
+        );
+      }
     }
 
     if (!role || !role.trim()) {
@@ -164,17 +180,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingPhone = await db
-      .select()
-      .from(users)
-      .where(eq(users.phone, cleanedPhone))
-      .limit(1);
+    // Only check for existing phone if phone is provided
+    if (cleanedPhone) {
+      const existingPhone = await db
+        .select()
+        .from(users)
+        .where(eq(users.phone, cleanedPhone))
+        .limit(1);
 
-    if (existingPhone.length > 0) {
-      return NextResponse.json(
-        { error: 'Phone number already exists', code: 'PHONE_EXISTS' },
-        { status: 400 }
-      );
+      if (existingPhone.length > 0) {
+        return NextResponse.json(
+          { error: 'Phone number already exists', code: 'PHONE_EXISTS' },
+          { status: 400 }
+        );
+      }
     }
 
     const newUser = await db
@@ -192,8 +211,25 @@ export async function POST(request: NextRequest) {
       .returning();
 
     return NextResponse.json(newUser[0], { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('POST error:', error);
+    
+    // Handle specific database errors
+    if (error.message?.includes('UNIQUE constraint failed')) {
+      if (error.message.includes('email')) {
+        return NextResponse.json(
+          { error: 'Email already exists', code: 'EMAIL_EXISTS' },
+          { status: 400 }
+        );
+      }
+      if (error.message.includes('phone')) {
+        return NextResponse.json(
+          { error: 'Phone number already exists', code: 'PHONE_EXISTS' },
+          { status: 400 }
+        );
+      }
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error: ' + error.message },
       { status: 500 }
