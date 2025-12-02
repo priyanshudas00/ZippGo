@@ -1,0 +1,11 @@
+# _redirects file for Cloudflare Pages
+
+# Redirect /admin to /admin/
+/admin /admin/ 301
+
+# SPA fallback for dynamic routes
+/user/* /user/index.html 200
+/admin/* /admin/index.html 200
+
+# API routes - these will need to be converted to Cloudflare Workers
+# /api/* /api/:splat 200
