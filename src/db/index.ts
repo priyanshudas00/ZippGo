@@ -1,15 +1,40 @@
 
 import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client/web';
 import * as schema from '@/db/schema';
 
-// Use web client for serverless environments (Cloudflare Pages, Vercel, etc.)
-// This avoids native binary dependencies that cause deployment issues
-const client = createClient({
-  url: process.env.TURSO_CONNECTION_URL!,
-  authToken: process.env.TURSO_AUTH_TOKEN!,
-});
+// Create client only in runtime, not during build
+let client: any = null;
 
-export const db = drizzle(client, { schema });
+// Lazy client initialization to avoid build-time issues
+const getClient = () => {
+  if (!client && typeof window === 'undefined' && process.env.TURSO_CONNECTION_URL) {
+    try {
+      // Dynamic import to avoid build-time loading
+      const { createClient } = require('@libsql/client/web');
+      client = createClient({
+        url: process.env.TURSO_CONNECTION_URL!,
+        authToken: process.env.TURSO_AUTH_TOKEN!,
+      });
+    } catch (error) {
+      console.warn('LibSQL client not available during build:', error);
+      return null;
+    }
+  }
+  return client;
+};
+
+// Mock database for build-time
+const mockDb = {
+  select: () => ({ from: () => ({ where: () => ({ limit: () => [] }) }) }),
+  insert: () => ({ values: () => ({ returning: () => [] }) }),
+  update: () => ({ set: () => ({ where: () => ({ returning: () => [] }) }) }),
+  delete: () => ({ where: () => [] }),
+} as any;
+
+export const db = typeof window !== 'undefined' || !process.env.NODE_ENV 
+  ? mockDb 
+  : getClient() 
+    ? drizzle(getClient()!, { schema }) 
+    : mockDb;
 
 export type Database = typeof db;

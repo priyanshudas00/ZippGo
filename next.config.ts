@@ -5,7 +5,6 @@ const LOADER = path.resolve(__dirname, 'src/visual-edits/component-tagger-loader
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
-  // Configure for Cloudflare Pages
   images: {
     remotePatterns: [
       {
@@ -17,7 +16,7 @@ const nextConfig: NextConfig = {
         hostname: '**',
       },
     ],
-    unoptimized: true, // Required for Cloudflare Pages
+    unoptimized: true,
   },
   outputFileTracingRoot: path.resolve(__dirname, '../../'),
   typescript: {
