@@ -1,0 +1,30 @@
+# Cloudflare Pages deployment settings
+
+# Build settings
+[build]
+  # Build command that Cloudflare Pages should use
+  command = "npm run build"
+  # Directory with build output
+  publish = ".next"
+
+# Environment variables for build
+[build.environment]
+  # Specify Node.js version compatible with Next.js 15
+  NODE_VERSION = "20.18.1"
+  # Skip Cloudflare optimizations that might interfere
+  SKIP_DEPENDENCY_INSTALL = "false"
+  
+# Headers for security and optimization
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Redirects for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"]}

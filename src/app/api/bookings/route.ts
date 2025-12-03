@@ -3,6 +3,8 @@ import { db } from '@/db';
 import { bookings } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 
+export const runtime = 'edge';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

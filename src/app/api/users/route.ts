@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users } from '@/db/schema';
+
+export const runtime = 'edge';
 import { eq, like, or, and, desc } from 'drizzle-orm';
 
 const VALID_ROLES = ['user', 'partner', 'admin', 'staff'];
