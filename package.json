@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "next dev --turbopack",
         "build": "next build",
+        "build:cloudflare": "node scripts/build-cloudflare.js",
         "build:cf": "npx @cloudflare/next-on-pages",
         "start": "next start",
         "preview": "wrangler pages dev .vercel/output/static",

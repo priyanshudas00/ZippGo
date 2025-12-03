@@ -33,6 +33,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeServerReact: false,
   },
+  output: 'standalone',
   turbopack: {
     resolveAlias: {
       underscore: 'lodash',
