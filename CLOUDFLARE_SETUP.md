@@ -38,11 +38,17 @@ NEXT_TELEMETRY_DISABLED=1
 ### 3. Deployment Process
 1. Go to your Cloudflare Pages dashboard
 2. Navigate to your project's Settings
-3. Update **Build command** to: `npm install --legacy-peer-deps && npm run build:cloudflare`
+3. **CRITICAL**: Update **Build command** to: `npm install --legacy-peer-deps && npm run build:cloudflare`
+   - **DO NOT use** `--no-optional` flag as it causes dependency resolution issues
 4. Ensure **Build output directory** is set to: `.next`
 5. Add all environment variables listed above
-6. **CRITICAL**: Change `NODE_ENV` from `development` to `production`
+6. **CRITICAL**: Ensure `NODE_ENV=production` (not development)
 7. Save settings and trigger a new deployment
+
+### 🚨 Common Issues & Fixes
+- **Module resolution errors**: Ensure build command does NOT include `--no-optional`
+- **Missing dependencies**: Cloudflare should install ~1800+ packages, not ~600
+- **UI component not found**: Usually caused by incomplete dependency installation
 
 ## 🔧 Technical Details
 - **Database**: LibSQL web client with build-time mocking to avoid native binaries

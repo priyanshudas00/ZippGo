@@ -13,6 +13,9 @@ process.env.NODE_ENV = 'production';
 const { execSync } = require('child_process');
 
 try {
+    console.log('Running build environment verification...');
+    execSync('node scripts/verify-build.js', { stdio: 'inherit' });
+
     console.log('Running Next.js build...');
     execSync('npx next build', {
         stdio: 'inherit',
@@ -21,7 +24,9 @@ try {
             // Disable problematic features during build
             NEXT_TELEMETRY_DISABLED: '1',
             // Use web client only
-            LIBSQL_CLIENT_TYPE: 'web'
+            LIBSQL_CLIENT_TYPE: 'web',
+            // Ensure proper module resolution
+            NODE_PATH: 'node_modules',
         }
     });
 
