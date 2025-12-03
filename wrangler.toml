@@ -1,10 +1,11 @@
 name = "zippgo-mobility-app"
 compatibility_date = "2024-12-04"
 compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".next"
 
 # Pages configuration for Next.js
 [build]
-command = "npm run build:cf"
+command = "npm install --legacy-peer-deps && npm run build"
 cwd = ""
 
 # Environment variables
@@ -13,9 +14,11 @@ name = "zippgo-mobility-app"
 
 [env.production.vars]
 NODE_ENV = "production"
+SKIP_LIBSQL_BUILD_CHECK = "true"
 TURSO_CONNECTION_URL = "libsql://db-333146d4-5c5e-44d1-84e1-2ae9b69c33d0-orchids.aws-us-west-2.turso.io"
 TURSO_AUTH_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NjQ3MDAxOTIsImlkIjoiNDM0NDdjYmQtMzFlNy00Yzg3LTkxYmEtNGMxYTYyMTYwODUzIiwicmlkIjoiMWMyNWRiYmMtNDUwYS00OGQyLWIwNGYtOWVjOWExNzhmODYyIn0.YTXqFtrq7Id_XreOLnZvrETbcpFQGDpafwd-yN8NJpveEmNjbYKChNEn3fHeUYXuxKVvPe2i1gHgN9-tzrwwDg"
 BETTER_AUTH_SECRET = "OsXo8d/Rt0PCOcrlEw3Pgi9almtWI+2l++Xh22SB7lY="
+BETTER_AUTH_URL = "https://zippgo-mobility-app.pages.dev"
 GOOGLE_CLIENT_ID = "1061815046640-gd6f5ndvncg1ttbot67ru6dml1dur3nr.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "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"
 

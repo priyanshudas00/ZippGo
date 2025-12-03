@@ -2,39 +2,39 @@
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
 
-// Create client only in runtime, not during build
-let client: any = null;
-
-// Lazy client initialization to avoid build-time issues
-const getClient = () => {
-  if (!client && typeof window === 'undefined' && process.env.TURSO_CONNECTION_URL) {
-    try {
-      // Dynamic import to avoid build-time loading
-      const { createClient } = require('@libsql/client/web');
-      client = createClient({
-        url: process.env.TURSO_CONNECTION_URL!,
-        authToken: process.env.TURSO_AUTH_TOKEN!,
-      });
-    } catch (error) {
-      console.warn('LibSQL client not available during build:', error);
-      return null;
-    }
+// Conditional client creation for different environments
+const createDbClient = () => {
+  // During build time or when environment variables are missing
+  if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'development') {
+    return null;
   }
-  return client;
+
+  if (!process.env.TURSO_CONNECTION_URL || !process.env.TURSO_AUTH_TOKEN) {
+    console.warn('Database credentials not found');
+    return null;
+  }
+
+  try {
+    // Use dynamic import to avoid loading during static generation
+    const { createClient } = require('@libsql/client/web');
+    return createClient({
+      url: process.env.TURSO_CONNECTION_URL,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+  } catch (error) {
+    console.warn('Failed to create LibSQL client:', error);
+    return null;
+  }
 };
 
-// Mock database for build-time
-const mockDb = {
-  select: () => ({ from: () => ({ where: () => ({ limit: () => [] }) }) }),
-  insert: () => ({ values: () => ({ returning: () => [] }) }),
-  update: () => ({ set: () => ({ where: () => ({ returning: () => [] }) }) }),
-  delete: () => ({ where: () => [] }),
-} as any;
+const client = createDbClient();
 
-export const db = typeof window !== 'undefined' || !process.env.NODE_ENV 
-  ? mockDb 
-  : getClient() 
-    ? drizzle(getClient()!, { schema }) 
-    : mockDb;
+// Export database or mock based on client availability
+export const db = client ? drizzle(client, { schema }) : {
+  select: () => ({ from: () => ({ where: () => ({ limit: () => Promise.resolve([]) }) }) }),
+  insert: () => ({ values: () => ({ returning: () => Promise.resolve([]) }) }),
+  update: () => ({ set: () => ({ where: () => ({ returning: () => Promise.resolve([]) }) }) }),
+  delete: () => ({ where: () => Promise.resolve([]) }),
+} as any;
 
 export type Database = typeof db;
