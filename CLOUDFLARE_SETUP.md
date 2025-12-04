@@ -40,7 +40,7 @@ NEXT_TELEMETRY_DISABLED=1
 2. Navigate to your project's Settings
 3. **CRITICAL**: Update **Build command** to: `npm install --legacy-peer-deps && npm run build:cloudflare`
    - **DO NOT use** `--no-optional` flag as it causes dependency resolution issues
-4. Ensure **Build output directory** is set to: `.next`
+4. **CRITICAL**: Set **Build output directory** to: `.next` (WITH THE DOT, not `/next`)
 5. Add all environment variables listed above
 6. **CRITICAL**: Ensure `NODE_ENV=production` (not development)
 7. Save settings and trigger a new deployment
@@ -49,6 +49,8 @@ NEXT_TELEMETRY_DISABLED=1
 - **Module resolution errors**: Ensure build command does NOT include `--no-optional`
 - **Missing dependencies**: Cloudflare should install ~1800+ packages, not ~600
 - **UI component not found**: Usually caused by incomplete dependency installation
+- **Build output directory**: MUST be `.next` (with dot), NOT `/next`
+- **Old commit deployed**: Trigger new deployment to get latest fixes
 
 ## 🔧 Technical Details
 - **Database**: LibSQL web client with build-time mocking to avoid native binaries
