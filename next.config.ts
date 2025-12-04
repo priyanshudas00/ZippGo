@@ -35,7 +35,16 @@ const nextConfig: NextConfig = {
   },
   output: 'standalone',
   distDir: 'next',
-  distDir: 'next',
+  webpack: (config) => {
+    // Add path aliases for module resolution
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+      '@/components': path.resolve(__dirname, 'src/components'),
+      '@/lib': path.resolve(__dirname, 'src/lib'),
+    };
+    return config;
+  },
   turbopack: {
     resolveAlias: {
       underscore: 'lodash',

@@ -76,6 +76,7 @@ if (fs.existsSync('node_modules')) {
         if (missingDeps.length > 0) {
             console.log(`❌ Missing critical dependencies: ${missingDeps.join(', ')}`);
             console.log('   This will cause build failures');
+            // Don't exit here - let the main build script handle TypeScript installation
         }
     } catch (error) {
         console.log('❌ Error reading node_modules:', error.message);
