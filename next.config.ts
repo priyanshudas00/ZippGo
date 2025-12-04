@@ -35,6 +35,7 @@ const nextConfig: NextConfig = {
   },
   output: 'standalone',
   distDir: 'next',
+  distDir: 'next',
   turbopack: {
     resolveAlias: {
       underscore: 'lodash',
