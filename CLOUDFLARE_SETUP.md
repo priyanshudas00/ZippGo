@@ -1,5 +1,7 @@
 # Cloudflare Pages Configuration Guide
 
+⚠️ **CRITICAL**: Build output directory MUST be `/next` (configured in next.config.ts)
+
 This guide provides complete setup instructions for deploying the ZippGo mobility application to Cloudflare Pages.
 
 ## ✅ Fixed Issues
@@ -15,7 +17,7 @@ This guide provides complete setup instructions for deploying the ZippGo mobilit
 Configure these in your Cloudflare Pages project settings:
 
 - **Build command**: `npm install --legacy-peer-deps && npm run build:cloudflare`
-- **Build output directory**: `.next`
+- **Build output directory**: `/next`
 - **Root directory**: `/` (leave empty)
 - **Node.js version**: `20.18.1` (automatic)
 
@@ -40,7 +42,7 @@ NEXT_TELEMETRY_DISABLED=1
 2. Navigate to your project's Settings
 3. **CRITICAL**: Update **Build command** to: `npm install --legacy-peer-deps && npm run build:cloudflare`
    - **DO NOT use** `--no-optional` flag as it causes dependency resolution issues
-4. **CRITICAL**: Set **Build output directory** to: `.next` (WITH THE DOT, not `/next`)
+4. **CRITICAL**: Set **Build output directory** to: `/next`
 5. Add all environment variables listed above
 6. **CRITICAL**: Ensure `NODE_ENV=production` (not development)
 7. Save settings and trigger a new deployment
@@ -49,7 +51,7 @@ NEXT_TELEMETRY_DISABLED=1
 - **Module resolution errors**: Ensure build command does NOT include `--no-optional`
 - **Missing dependencies**: Cloudflare should install ~1800+ packages, not ~600
 - **UI component not found**: Usually caused by incomplete dependency installation
-- **Build output directory**: MUST be `.next` (with dot), NOT `/next`
+- **Build output directory**: MUST be `/next` as configured in next.config.ts
 - **Old commit deployed**: Trigger new deployment to get latest fixes
 
 ## 🔧 Technical Details

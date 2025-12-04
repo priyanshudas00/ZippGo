@@ -34,6 +34,7 @@ const nextConfig: NextConfig = {
     optimizeServerReact: false,
   },
   output: 'standalone',
+  distDir: 'next',
   turbopack: {
     resolveAlias: {
       underscore: 'lodash',

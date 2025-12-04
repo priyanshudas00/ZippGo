@@ -56,15 +56,27 @@ if (fs.existsSync('node_modules')) {
         const packageCount = fs.readdirSync('node_modules').length;
         console.log(`✅ node_modules contains ${packageCount} packages`);
 
+        if (packageCount < 1000) {
+            console.log(`⚠️  WARNING: Only ${packageCount} packages installed - expected ~1800+`);
+            console.log('   This may cause module resolution issues');
+        }
+
         // Check critical dependencies
         const criticalDeps = ['next', 'react', 'typescript'];
+        let missingDeps = [];
         criticalDeps.forEach(dep => {
             if (fs.existsSync(`node_modules/${dep}`)) {
                 console.log(`✅ Found critical dependency: ${dep}`);
             } else {
                 console.log(`❌ Missing critical dependency: ${dep}`);
+                missingDeps.push(dep);
             }
         });
+
+        if (missingDeps.length > 0) {
+            console.log(`❌ Missing critical dependencies: ${missingDeps.join(', ')}`);
+            console.log('   This will cause build failures');
+        }
     } catch (error) {
         console.log('❌ Error reading node_modules:', error.message);
     }
@@ -72,7 +84,6 @@ if (fs.existsSync('node_modules')) {
     console.log('❌ Missing node_modules directory');
     process.exit(1);
 }
-
 if (missingComponents.length > 0) {
     console.log('\n❌ Build verification failed - missing components');
     process.exit(1);
